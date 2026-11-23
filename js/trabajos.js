@@ -65,9 +65,8 @@ const TRABAJOS = [
       'topados/topados-1.jpg',
       'topados/topados-2.jpg',
       'topados/topados-5.jpg',
-      { src: 'topados/topados-video.mp4', v: true },
-      'topados/topados-3.jpg', 'topados/topados-4.jpg', 'topados/topados-6.jpg',
-      { src: 'topados/topados-reel.mp4', v: true }
+      { src: 'topados/topados-reel.mp4', v: true },
+      'topados/topados-3.jpg', 'topados/topados-4.jpg', 'topados/topados-6.jpg'
     ]
   },
 
@@ -78,14 +77,14 @@ const TRABAJOS = [
     piezas: [{ src: 'motion/ariana.mp4' }]
   },
   {
-    id: 'cactus-motion', cat: 'motion', titulo: 'cActus',
-    texto: 'Video de marca de cactus®, estudio de diseño, animado en motion graphics.',
-    piezas: [{ src: 'cactus/cactus-video.mp4' }]
-  },
-  {
     id: 'my-way', cat: 'motion', titulo: 'my way',
     texto: 'Motion graphics para acompañar la letra de una canción: tipografía, animación y recursos gráficos en movimiento.',
     piezas: [{ src: 'motion/my-way.mp4' }]
+  },
+  {
+    id: 'cactus-motion', cat: 'motion', titulo: 'cActus',
+    texto: 'Reel en motion graphics para presentar la web de cactus®, estudio de diseño.',
+    piezas: [{ src: 'motion/cactus-promo.mp4', v: true }]
   },
 
   /* ---------- redes sociales ---------- */

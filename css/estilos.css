@@ -275,6 +275,8 @@ body.con-intro { overflow: hidden; }
   transition: transform .3s ease-in-out;
 }
 .ruleta__pista span { display: block; height: 86px; }
+/* reserva el ancho de la palabra más larga: así el título no se corre cuando cambia la palabra */
+.ruleta__pista .ruleta__ancho { height: 0 !important; overflow: hidden; visibility: hidden; }
 
 /* cartel "scrolleá" */
 .cartel {
@@ -522,6 +524,8 @@ body.con-intro { overflow: hidden; }
   border: 0;
   background: none;
 }
+/* en proyectos y trabajos va debajo de la banda de categorías */
+.pagina-interna .musica { top: calc(var(--header) + 56px + 20px); }
 .musica__base { width: 100%; height: 100%; pointer-events: none; }
 .musica__cd {
   position: absolute;
@@ -870,7 +874,7 @@ a.grupo__titulo:hover { color: var(--rosa); }
     padding: 8px 0;
   }
 
-  .hero__textos { font-size: 11vw; line-height: 1.08; margin-top: -20px; }
+  .hero__textos { font-size: 9.6vw; line-height: 1.08; margin-top: -20px; }
   .ruleta, .ruleta__pista span { height: 1.08em; }
   .cartel { font-size: 17px; margin-top: 44px; }
 
@@ -887,13 +891,14 @@ a.grupo__titulo:hover { color: var(--rosa); }
   .flor--4 { width: 70px; right: 0; bottom: -60px; }
 
   .bloque-proyectos { min-height: 440px; }
-  .titulo-proyectos .titulo-script__script { font-size: 26vw; }
-  .titulo-proyectos .titulo-script__bold { font-size: 6.1vw; }
+  .titulo-proyectos .titulo-script__script { font-size: 21vw; }
+  .titulo-proyectos .titulo-script__bold { font-size: 4.95vw; }
 
   .contacto { padding-top: 80px; }
   .postal__cara { box-shadow: 2px 2px 3px rgba(0, 0, 0, .25); }
 
-  .musica { width: 74px; height: 74px; top: auto; bottom: 16px; right: 12px; }
+  .musica { width: 64px; height: 64px; top: calc(var(--header) + 12px); right: 12px; }
+  .pagina-interna .musica { top: calc(var(--header) + 50px + 12px); }
 
   .footer { height: auto; aspect-ratio: 390 / 420; min-height: 360px; }
   .footer__logo { top: auto; bottom: -6%; }
