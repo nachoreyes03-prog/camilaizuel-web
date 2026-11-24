@@ -661,31 +661,37 @@ body.con-intro { overflow: hidden; }
   text-decoration-thickness: 2px;
 }
 
-/* --- opción A: píldoras (rectángulos redondeados detrás de cada categoría) --- */
+/* --- opción A: píldoras (marrones con texto blanco; la elegida rosa con texto marrón; sin banda atrás) --- */
 .menu-pildoras { --banda: 76px; }
-.categorias--pildoras { height: var(--banda); }
+.categorias--pildoras { height: var(--banda); background: var(--fondo); }
 .categorias--pildoras .categorias__lista { gap: 14px; }
 .categorias--pildoras a {
-  background: var(--fondo);
-  color: var(--marron);
+  background: var(--marron);
+  color: #fff;
   padding: 8px 20px 9px 18px;
   border-radius: 999px;
-  transition: background-color .25s, transform .25s;
+  transition: background-color .25s, color .25s, transform .25s;
 }
-.categorias--pildoras a:hover { color: var(--marron); background: #fff; transform: translateY(-2px); }
-.categorias--pildoras a.activa { background: var(--rosa-claro); color: var(--marron); }
+.categorias--pildoras a:hover { color: #fff; background: #6E4A45; transform: translateY(-2px); }
+.categorias--pildoras a.activa { background: var(--rosa-claro); color: var(--marron); text-decoration: none; }
 
-/* --- opción B: carpetas (pestañas; la elegida se abre sobre la página) --- */
-.menu-carpetas { --banda: 84px; }
-.categorias--carpetas { height: var(--banda); align-items: flex-end; }
-.categorias--carpetas .categorias__lista { gap: 10px; align-items: flex-end; }
+/* --- opción B: carpetas (sin banda; la pestaña elegida es la carpeta que contiene todos los trabajos) --- */
+.menu-carpetas { --banda: 72px; --carpeta: var(--rosa-claro); }
+.categorias--carpetas {
+  height: var(--banda);
+  background: var(--fondo);
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-left: max(var(--lado), calc((100% - 1200px) / 2));
+}
+.categorias--carpetas .categorias__lista { gap: 8px; align-items: flex-end; padding: 0 16px 0 0; }
 .categorias--carpetas a {
   position: relative;
-  background: var(--rosa);
-  color: var(--marron);
+  background: var(--marron);
+  color: #fff;
   padding: 10px 22px 11px 18px;
   border-radius: 0 12px 0 0;
-  transition: background-color .25s, padding .25s;
+  transition: background-color .25s, color .25s, padding .25s;
 }
 .categorias--carpetas a::before {
   content: "";
@@ -698,12 +704,23 @@ body.con-intro { overflow: hidden; }
   border-radius: 9px 0 0 0;
   clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
 }
-.categorias--carpetas a:hover { color: var(--marron); background: var(--rosa-claro); padding-bottom: 15px; }
+.categorias--carpetas a:hover { color: #fff; background: #6E4A45; padding-bottom: 15px; }
 .categorias--carpetas a.activa {
-  background: var(--fondo);
+  background: var(--carpeta);
   color: var(--marron);
+  text-decoration: none;
   padding-bottom: 17px;
 }
+/* el cuerpo de la carpeta: abarca todo el contenido hasta el footer */
+.menu-carpetas .listado {
+  max-width: none;
+  background: var(--carpeta);
+  padding-left: max(var(--lado), calc((100% - 1200px) / 2));
+  padding-right: max(var(--lado), calc((100% - 1200px) / 2));
+}
+.menu-carpetas .listado.cambiando { opacity: 1; transform: none; }
+.menu-carpetas .listado > * { transition: opacity .35s ease, transform .35s ease; }
+.menu-carpetas .listado.cambiando > * { opacity: 0; transform: translateY(16px); }
 
 .listado {
   max-width: 1440px;
