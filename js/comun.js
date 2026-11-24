@@ -1,13 +1,12 @@
-/* Partes compartidas por todas las páginas: header, menú, música y footer */
+/* Partes compartidas por todas las páginas: header, menú, música, footer
+   y la navegación entre páginas sin recargar (para que la música no se corte). */
 (function () {
   const WHATSAPP = 'https://wa.me/5491163596278?text=Hola%20Cami!%20Vi%20tu%20portfolio%20y%20quiero%20hablar%20sobre%20un%20proyecto';
   const FOTOGRAFIA = 'https://www.foto.camilaizuel.com';
-  const enInicio = document.body.classList.contains('pagina-inicio');
-  const ir = id => (enInicio ? '#' + id : 'index.html#' + id);
   const links = [
-    ['sobre mí', ir('sobremi')],
+    ['sobre mí', 'index.html#sobremi'],
     ['portfolio', 'proyectos.html'],
-    ['contacto', ir('contacto')]
+    ['contacto', 'index.html#contacto']
   ];
 
   // ---------- header ----------
@@ -37,11 +36,9 @@
     document.addEventListener('click', e => { if (!menu.contains(e.target)) cerrar(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
 
-    if (enInicio) {
-      const sombra = () => header.classList.toggle('con-sombra', window.scrollY > 10);
-      window.addEventListener('scroll', sombra, { passive: true });
-      sombra();
-    }
+    const sombra = () => header.classList.toggle('con-sombra', window.scrollY > 10);
+    window.addEventListener('scroll', sombra, { passive: true });
+    sombra();
   }
 
   // ---------- música (CD) ----------
@@ -53,12 +50,32 @@
   audio.loop = true;
   audio.volume = 0.5;
   const cd = musica.querySelector('.musica__cd');
-  const play = () => audio.play().then(() => cd.classList.add('gira')).catch(() => {});
-  musica.addEventListener('click', () => {
-    if (audio.paused) play(); else { audio.pause(); cd.classList.remove('gira'); }
-  });
+  const play = () => audio.play().then(() => { cd.classList.add('gira'); guardarMusica(); }).catch(() => {});
+  const pausar = () => { audio.pause(); cd.classList.remove('gira'); guardarMusica(); };
+  musica.addEventListener('click', () => { if (audio.paused) play(); else pausar(); });
   document.body.appendChild(musica);
-  window.CAMI = { play, musica };
+
+  // si la página se recarga igual (link directo, F5), la música sigue desde donde iba;
+  // si el navegador no deja arrancar solo, arranca con el primer toque o clic
+  function guardarMusica() {
+    try { sessionStorage.setItem('musica', JSON.stringify({ sonando: !audio.paused, t: audio.currentTime })); } catch (e) {}
+  }
+  window.addEventListener('pagehide', guardarMusica);
+  setInterval(() => { if (!audio.paused) guardarMusica(); }, 2000);
+  let estado = null;
+  try { estado = JSON.parse(sessionStorage.getItem('musica') || 'null'); } catch (e) {}
+  if (estado && estado.sonando) {
+    const retomar = () => {
+      if (!audio.paused) return;
+      try { audio.currentTime = estado.t || 0; } catch (e) {}
+      play();
+    };
+    audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = estado.t || 0; } catch (e) {} }, { once: true });
+    audio.play().then(() => cd.classList.add('gira')).catch(() => {
+      const unaVez = () => { retomar(); ['pointerdown', 'keydown', 'touchend'].forEach(ev => document.removeEventListener(ev, unaVez, true)); };
+      ['pointerdown', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, unaVez, true));
+    });
+  }
 
   // ---------- footer ----------
   const footer = document.getElementById('footer');
@@ -75,20 +92,117 @@
       '<img class="footer__logo" src="assets/img/logo-footer.svg" alt="">';
   }
 
-  // links "contactame" a WhatsApp
-  document.querySelectorAll('[data-whatsapp]').forEach(a => { a.href = WHATSAPP; });
-
-  // reveal al scrollear
+  // ---------- reveal al scrollear ----------
   const io = 'IntersectionObserver' in window ? new IntersectionObserver((entradas, obs) => {
     entradas.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target); } });
   }, { threshold: 0.12 }) : null;
   window.observarAparece = raiz => (raiz || document).querySelectorAll('.aparece:not(.visto)').forEach(el => io ? io.observe(el) : el.classList.add('visto'));
-  observarAparece();
+
+  function prepararPagina() {
+    document.querySelectorAll('[data-whatsapp]').forEach(a => { a.href = WHATSAPP; });
+    observarAparece();
+  }
+  prepararPagina();
 
   // preview en GitHub: que Google no la indexe
   if (/github\.io$/.test(location.hostname)) {
     const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m);
   }
+
+  // ---------- navegación sin recargar ----------
+  // Los links internos cambian el contenido de la página en vez de cargar otra,
+  // así el audio nunca se corta. Si algo falla, se navega de la forma normal.
+  const salidas = [];
+  const alSalir = fn => salidas.push(fn);
+  window.CAMI = { play, pausar, musica, audio, alSalir };
+
+  const fijos = el => el === header || el === footer || el === musica ||
+    (el.classList && el.classList.contains('menu-movil')) || el.tagName === 'SCRIPT';
+  const nombre = src => (src.split('/').pop() || '').split('?')[0];
+  const cargados = new Set([...document.scripts].map(s => nombre(s.src)).filter(Boolean));
+  const UNA_VEZ = ['comun.js', 'trabajos.js'];
+  // "/sitio/" y "/sitio/index.html" son la misma página
+  const ruta = p => p.replace(/index\.html$/, '');
+  let paginaActual = ruta(location.pathname) + location.search;
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  function cargarScript(src) {
+    return new Promise(res => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = s.onerror = () => { s.remove(); res(); };
+      document.body.appendChild(s);
+    });
+  }
+
+  function irAHash(hash, suave) {
+    if (!hash) return false;
+    let el = null;
+    try { el = document.querySelector(decodeURIComponent(hash)); } catch (e) {}
+    if (!el) return false;
+    el.scrollIntoView({ behavior: suave ? 'smooth' : 'auto' });
+    return true;
+  }
+
+  async function navegar(url, empujar, y) {
+    let html;
+    try {
+      const r = await fetch(url.href, { credentials: 'same-origin' });
+      if (!r.ok) throw new Error(r.status);
+      html = await r.text();
+    } catch (e) { location.href = url.href; return; }
+
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    if (empujar) {
+      try { history.replaceState(Object.assign({}, history.state, { y: window.scrollY }), ''); } catch (e) {}
+      history.pushState({ pjax: true }, '', url.href);
+    }
+
+    salidas.splice(0).forEach(fn => { try { fn(); } catch (e) {} });
+    [...document.body.children].forEach(el => { if (!fijos(el)) el.remove(); });
+    [...doc.body.children].forEach(el => {
+      if (el.id === 'header' || el.id === 'footer' || el.tagName === 'SCRIPT') return;
+      document.body.insertBefore(document.importNode(el, true), footer);
+    });
+    document.body.className = doc.body.className;
+    document.title = doc.title;
+    paginaActual = ruta(location.pathname) + location.search;
+    window.scrollTo(0, y || 0);
+
+    for (const s of doc.querySelectorAll('body script[src]')) {
+      const n = nombre(s.getAttribute('src'));
+      if (n === 'comun.js' || (UNA_VEZ.includes(n) && cargados.has(n))) continue;
+      cargados.add(n);
+      await cargarScript(s.getAttribute('src'));
+    }
+    prepararPagina();
+    if (!y) irAHash(location.hash, false);
+    if (window.gtag) gtag('event', 'page_view', { page_location: location.href, page_title: document.title });
+  }
+
+  document.addEventListener('click', e => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || !/\.html$|\/$/.test(url.pathname)) return;
+    if (location.protocol === 'file:') return;
+    e.preventDefault();
+    // mismo lugar, solo cambia el #: deslizar hasta ahí
+    if (ruta(url.pathname) === ruta(location.pathname) && url.search === location.search && url.hash) {
+      if (irAHash(url.hash, true)) history.replaceState(history.state, '', url.href);
+      return;
+    }
+    navegar(url, true);
+  });
+
+  window.addEventListener('popstate', e => {
+    const mismaRuta = ruta(location.pathname) === paginaActual.split('?')[0];
+    // dentro de proyectos (cambio de categoría) o del inicio (#) se encarga la propia página
+    if (mismaRuta && !/trabajo\.html$/.test(location.pathname)) return;
+    if (ruta(location.pathname) + location.search === paginaActual) return;
+    navegar(new URL(location.href), false, e.state && e.state.y);
+  });
 })();
 
 /* Videos de las grillas: se reproducen solo cuando se ven */

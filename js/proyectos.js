@@ -43,6 +43,7 @@
 
     listado.innerHTML = html;
     menu.querySelectorAll('a').forEach(a => a.classList.toggle('activa', a.dataset.cat === cat.id));
+    document.title = 'Proyectos · ' + cat.nombre + ' · Camila Izuel';
     observarAparece(listado);
     videosVisibles(listado);
     return cat;
@@ -73,10 +74,14 @@
     }, 250);
   }
 
-  window.addEventListener('popstate', () => pintar(new URLSearchParams(location.search).get('cat')));
+  // atrás / adelante entre categorías (solo mientras se está en proyectos)
+  const alVolver = () => {
+    if (/proyectos\.html$/.test(location.pathname)) pintar(new URLSearchParams(location.search).get('cat'));
+  };
+  window.addEventListener('popstate', alVolver);
+  if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => window.removeEventListener('popstate', alVolver));
 
   const inicial = pintar(new URLSearchParams(location.search).get('cat'));
   const activa = menu.querySelector(`[data-cat="${inicial.id}"]`);
   if (activa && activa.scrollIntoView) activa.scrollIntoView({ block: 'nearest', inline: 'center' });
-  document.title = 'Proyectos · ' + inicial.nombre + ' · Camila Izuel';
 })();

@@ -52,5 +52,7 @@
   piezas.querySelectorAll('img').forEach(i => { i.style.cursor = 'zoom-in'; });
   document.getElementById('lupa-cerrar').addEventListener('click', cerrar);
   lupa.addEventListener('click', e => { if (e.target === lupa) cerrar(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+  const conEscape = e => { if (e.key === 'Escape') cerrar(); };
+  document.addEventListener('keydown', conEscape);
+  if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => document.removeEventListener('keydown', conEscape));
 })();

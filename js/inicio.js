@@ -30,7 +30,12 @@
   }
   function arrancarHome() {
     body.classList.add('cargado');
-    if (!ruletaActiva) { ruletaActiva = true; setTimeout(() => setInterval(girarPalabra, 900), 1600); }
+    if (!ruletaActiva) {
+      ruletaActiva = true;
+      const espera = setTimeout(() => { reloj = setInterval(girarPalabra, 900); }, 1600);
+      let reloj = null;
+      if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => { clearTimeout(espera); clearInterval(reloj); });
+    }
   }
 
   // ---------- intro (una vez por visita) ----------
@@ -113,7 +118,7 @@
   // ---------- flores que giran con el scroll ----------
   const flores = document.querySelectorAll('.flor');
   let pedido = false;
-  window.addEventListener('scroll', () => {
+  const girarFlores = () => {
     if (pedido) return;
     pedido = true;
     requestAnimationFrame(() => {
@@ -121,7 +126,9 @@
       flores.forEach(f => { f.style.transform = `rotate(${g}deg)`; });
       pedido = false;
     });
-  }, { passive: true });
+  };
+  window.addEventListener('scroll', girarFlores, { passive: true });
+  if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => window.removeEventListener('scroll', girarFlores));
 
   // ---------- postal que se da vuelta ----------
   // hover en compu, toque en celular; se da vuelta entera aunque el mouse salga a mitad del giro
