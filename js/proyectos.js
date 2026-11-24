@@ -48,6 +48,17 @@
     return cat;
   }
 
+  // estilo del menú a prueba: ?menu=pildoras o ?menu=carpetas (se recuerda durante la visita)
+  const ESTILOS = ['pildoras', 'carpetas'];
+  let estilo = new URLSearchParams(location.search).get('menu');
+  try {
+    if (ESTILOS.includes(estilo)) sessionStorage.setItem('menu-estilo', estilo);
+    else estilo = sessionStorage.getItem('menu-estilo');
+  } catch (e) {}
+  if (!ESTILOS.includes(estilo)) estilo = 'pildoras';
+  menu.parentElement.classList.add('categorias--' + estilo);
+  document.body.classList.add('menu-' + estilo);
+
   // menú
   menu.innerHTML = CATEGORIAS.map(c => `<a href="?cat=${c.id}" data-cat="${c.id}">${c.nombre}</a>`).join('');
   menu.addEventListener('click', e => {
