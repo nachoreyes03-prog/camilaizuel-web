@@ -61,15 +61,15 @@ a { color: inherit; }
 
 .btn-foto {
   margin-left: auto;
-  width: 245px;
-  height: 55.5px;
-  border-radius: 28px;
+  width: 168px;
+  height: 42px;
+  border-radius: 21px;
   background: var(--rosa);
   color: var(--marron);
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
-  font-size: 29.9px;
-  letter-spacing: -0.11em;
+  font-size: 21px;
+  letter-spacing: -0.09em;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -627,7 +627,7 @@ body.con-intro { overflow: hidden; }
 .categorias {
   position: sticky;
   top: var(--header);
-  z-index: 850;
+  z-index: 700;
   background: var(--marron);
   height: 56px;
   display: flex;
@@ -661,9 +661,11 @@ body.con-intro { overflow: hidden; }
   text-decoration-thickness: 2px;
 }
 
-/* --- opción A: píldoras (marrones con texto blanco; la elegida rosa con texto marrón; sin banda atrás) --- */
+/* menú de categorías: píldoras marrones con texto blanco, la elegida rosa con texto marrón.
+   Sin fondo atrás (transparente) para que no tape el reproductor de música. */
 .menu-pildoras { --banda: 76px; }
-.categorias--pildoras { height: var(--banda); background: var(--fondo); }
+.categorias--pildoras { height: var(--banda); background: transparent; pointer-events: none; }
+.categorias--pildoras a { pointer-events: auto; }
 .categorias--pildoras .categorias__lista { gap: 14px; }
 .categorias--pildoras a {
   background: var(--marron);
@@ -674,53 +676,6 @@ body.con-intro { overflow: hidden; }
 }
 .categorias--pildoras a:hover { color: #fff; background: #6E4A45; transform: translateY(-2px); }
 .categorias--pildoras a.activa { background: var(--rosa-claro); color: var(--marron); text-decoration: none; }
-
-/* --- opción B: carpetas (sin banda; la pestaña elegida es la carpeta que contiene todos los trabajos) --- */
-.menu-carpetas { --banda: 72px; --carpeta: var(--rosa-claro); }
-.categorias--carpetas {
-  height: var(--banda);
-  background: var(--fondo);
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding-left: max(var(--lado), calc((100% - 1200px) / 2));
-}
-.categorias--carpetas .categorias__lista { gap: 8px; align-items: flex-end; padding: 0 16px 0 0; }
-.categorias--carpetas a {
-  position: relative;
-  background: var(--marron);
-  color: #fff;
-  padding: 10px 22px 11px 18px;
-  border-radius: 0 12px 0 0;
-  transition: background-color .25s, color .25s, padding .25s;
-}
-.categorias--carpetas a::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: calc(100% - 1px);
-  width: 58%;
-  height: 12px;
-  background: inherit;
-  border-radius: 9px 0 0 0;
-  clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
-}
-.categorias--carpetas a:hover { color: #fff; background: #6E4A45; padding-bottom: 15px; }
-.categorias--carpetas a.activa {
-  background: var(--carpeta);
-  color: var(--marron);
-  text-decoration: none;
-  padding-bottom: 17px;
-}
-/* el cuerpo de la carpeta: abarca todo el contenido hasta el footer */
-.menu-carpetas .listado {
-  max-width: none;
-  background: var(--carpeta);
-  padding-left: max(var(--lado), calc((100% - 1200px) / 2));
-  padding-right: max(var(--lado), calc((100% - 1200px) / 2));
-}
-.menu-carpetas .listado.cambiando { opacity: 1; transform: none; }
-.menu-carpetas .listado > * { transition: opacity .35s ease, transform .35s ease; }
-.menu-carpetas .listado.cambiando > * { opacity: 0; transform: translateY(16px); }
 
 .listado {
   max-width: 1440px;
@@ -922,7 +877,7 @@ a.grupo__titulo:hover { color: var(--rosa); }
   .header { padding: 0 16px; }
   .header__logo { width: 23px; height: 33px; }
   .header__nav { display: none; }
-  .btn-foto { width: auto; height: 42px; padding: 0 22px; font-size: 22px; }
+  .btn-foto { width: auto; height: 34px; padding: 0 15px 0 16px; font-size: 16px; }
   .hamburguesa {
     display: flex;
     flex-direction: column;
@@ -997,15 +952,11 @@ a.grupo__titulo:hover { color: var(--rosa); }
   .categorias { justify-content: flex-start; height: 50px; }
   .categorias__lista { gap: 28px; padding: 0 16px; }
   .categorias a { font-size: 18px; }
-  .categorias--pildoras, .categorias--carpetas { height: var(--banda); }
+  /* en el celu la fila se desliza de costado: tiene que recibir el dedo */
+  .categorias--pildoras { height: var(--banda); pointer-events: auto; }
   .menu-pildoras { --banda: 62px; }
   .categorias--pildoras .categorias__lista { gap: 8px; }
   .categorias--pildoras a { font-size: 17px; padding: 6px 15px 7px 13px; }
-  .menu-carpetas { --banda: 70px; }
-  .categorias--carpetas .categorias__lista { gap: 6px; }
-  .categorias--carpetas a { font-size: 16px; padding: 8px 17px 9px 13px; }
-  .categorias--carpetas a.activa { padding-bottom: 13px; }
-  .categorias--carpetas a:hover { padding-bottom: 9px; }
   .btn-ver { height: 44px; font-size: 20px; padding: 0 22px 0 24px; margin-top: 34px; }
   .listado { padding-top: 54px; padding-bottom: 70px; }
   .grupo + .grupo { margin-top: 64px; }
