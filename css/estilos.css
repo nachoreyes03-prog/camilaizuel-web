@@ -434,7 +434,8 @@ body.con-intro { overflow: hidden; }
 .banda__pista {
   display: flex;
   flex: none;
-  animation: banda 40s linear infinite;
+  animation: banda 40s linear infinite;   /* la duración la ajusta inicio.js según el ancho */
+  will-change: transform;
 }
 .banda__pista span {
   flex: none;
@@ -447,8 +448,8 @@ body.con-intro { overflow: hidden; }
   letter-spacing: -0.04em;
 }
 @keyframes banda {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
 }
 
 /* ================= CONOCÉ MIS PROYECTOS ================= */

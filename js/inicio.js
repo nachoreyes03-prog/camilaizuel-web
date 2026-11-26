@@ -4,11 +4,26 @@
   const body = document.body;
 
   // ---------- bandas "diseño pensado para vos <3" ----------
+  // Cada tramo cubre justo el ancho de la pantalla (+1 frase): en iPhone, Safari no anima capas muy anchas
+  // (con 14 repeticiones la pista medía ~7700 px y quedaba quieta). La velocidad es fija en px por segundo.
   const frase = 'diseño pensado para vos  <3  ';
-  document.querySelectorAll('.banda__pista').forEach(pista => {
-    const tramo = frase.repeat(14);
-    pista.innerHTML = `<span>${tramo.replace(/</g, '&lt;')}</span><span>${tramo.replace(/</g, '&lt;')}</span>`;
-  });
+  const VELOCIDAD = 95;                      // px/s, igual que antes (40 s por tramo de ~3800 px)
+  function armarBandas() {
+    document.querySelectorAll('.banda__pista').forEach(pista => {
+      pista.innerHTML = `<span>${frase.replace(/</g, '&lt;')}</span>`;
+      const anchoFrase = pista.firstChild.getBoundingClientRect().width || 280;
+      const veces = Math.ceil(window.innerWidth / anchoFrase) + 1;
+      const tramo = frase.repeat(veces).replace(/</g, '&lt;');
+      pista.innerHTML = `<span>${tramo}</span><span>${tramo}</span>`;
+      pista.style.animationDuration = (anchoFrase * veces / VELOCIDAD).toFixed(2) + 's';
+    });
+  }
+  armarBandas();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(armarBandas);   // medir con la tipo real
+  let anchoBandas = window.innerWidth;
+  const alCambiar = () => { if (Math.abs(window.innerWidth - anchoBandas) > 40) { anchoBandas = window.innerWidth; armarBandas(); } };
+  window.addEventListener('resize', alCambiar);
+  if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => window.removeEventListener('resize', alCambiar));
 
   // ---------- ruleta de palabras ----------
   const palabras = ['diseñadora', 'creativa', 'artista'];
