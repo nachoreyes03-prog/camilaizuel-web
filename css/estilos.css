@@ -798,36 +798,28 @@ a.grupo__titulo:hover { color: var(--rosa); }
 .trabajo__pieza img, .trabajo__pieza video { width: 100%; height: 100%; object-fit: cover; }
 .mosaico .trabajo__pieza { border-radius: 20px; }
 
-/* manual de marca en PDF */
-.trabajo__pdf { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-top: 20px; }
-.trabajo__pdf-visor {
-  width: 100%;
+/* manual de marca: páginas en un recuadro que solo se scrollea */
+.trabajo__manual {
+  margin-top: 20px;
   aspect-ratio: 1.3;
-  border: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #E2DCDA;
   border-radius: 20px;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rosa) transparent;
+}
+.trabajo__manual::-webkit-scrollbar { width: 8px; }
+.trabajo__manual::-webkit-scrollbar-thumb { background: var(--rosa); border-radius: 4px; }
+.trabajo__manual-hojas { display: flex; flex-direction: column; gap: 14px; }
+.trabajo__manual-hojas img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(89, 60, 56, .14);
   background: #fff;
-  box-shadow: 0 4px 14px rgba(89, 60, 56, .12);
 }
-.trabajo__pdf-tapa { display: block; width: 100%; border-radius: 20px; overflow: hidden; }
-.trabajo__pdf-tapa img { width: 100%; height: auto; }
-.btn-pdf {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 46px;
-  padding: 0 22px 0 24px;
-  border-radius: 23px;
-  background: var(--marron);
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: -0.08em;
-  text-decoration: none;
-  transition: background-color .25s, transform .25s;
-}
-.btn-pdf span { letter-spacing: 0; }
-.btn-pdf:hover { background: #6E4A45; transform: translateY(-2px); }
 
 .trabajo__info {
   position: sticky;
@@ -1019,7 +1011,8 @@ a.grupo__titulo:hover { color: var(--rosa); }
   .mosaico--beauty > [data-area="c"], .mosaico--beauty > [data-area="d"] { aspect-ratio: 1.8; }
   .mosaico--cyber { grid-template-columns: 1fr 1fr; grid-template-areas: "a b" "c d" "e e"; }
   .mosaico--cyber > [data-area="c"] { aspect-ratio: 0.665; }
-  .btn-pdf { font-size: 16px; height: 42px; }
+  .trabajo__manual { aspect-ratio: 0.95; padding: 10px; border-radius: 16px; }
+  .trabajo__manual-hojas { gap: 8px; }
 
   .trabajo { grid-template-columns: 1fr; padding-top: 40px; gap: 28px; }
   .trabajo__info { position: static; order: -1; padding-top: 0; }

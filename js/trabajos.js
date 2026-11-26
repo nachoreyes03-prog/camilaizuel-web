@@ -10,7 +10,8 @@
   - cat: id de la categoría. titulo, texto: lo que se lee en la pantalla del trabajo.
   - piezas: archivos dentro de assets/trabajos/. Los .mp4 son videos (su póster es el .jpg
     con el mismo nombre). r = proporción ancho / alto (16:9 = 1.778, vertical 9:16 = 0.5625).
-    Una pieza con pdf es un manual: src es su tapa y pdf el archivo que se abre.
+    Una pieza con manual: N es un manual de marca de N páginas: las páginas son p01.jpg,
+    p02.jpg... en la misma carpeta que src (src es la tapa) y se ven en un recuadro que se scrollea.
   - grilla (opcional): cuántas piezas se ven en el listado (por defecto 4).
   - mosaico (opcional): 'beauty' o 'cyber' arma el layout de referencia de Cami; cada pieza
     lleva su lugar en area (a, b, c...).
@@ -39,7 +40,7 @@ const TRABAJOS = [
     piezas: [
       { src: 'cactus/cactus-video.mp4', r: H },
       { src: 'cactus/cactus-web.mp4', r: V },
-      { src: 'cactus/manual-01.jpg', pdf: 'cactus/cactus-manual.pdf', r: A4 }
+      { src: 'cactus/manual/p01.jpg', manual: 17, r: A4 }
     ]
   },
   {
@@ -48,7 +49,7 @@ const TRABAJOS = [
     piezas: [
       { src: 'udent/udent-video.mp4', r: H },
       { src: 'udent/udent-web.mp4', r: H },
-      { src: 'udent/manual-01.jpg', pdf: 'udent/udent-manual.pdf', r: A4 }
+      { src: 'udent/manual/p01.jpg', manual: 16, r: A4 }
     ]
   },
   {
@@ -58,7 +59,7 @@ const TRABAJOS = [
       { src: 'topados/topados-video.mp4', r: V },
       { src: 'topados/topados-2.jpg', r: 0.8 },
       { src: 'topados/topados-4.jpg', r: 0.8 },
-      { src: 'topados/topados-manual.jpg', pdf: 'topados/topados-manual.pdf', r: A4 },
+      { src: 'topados/manual/p01.jpg', manual: 22, r: A4 },
       { src: 'topados/topados-reel.mp4', r: V }
     ]
   },

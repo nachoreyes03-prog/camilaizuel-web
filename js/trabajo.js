@@ -31,22 +31,20 @@
     return `<div class="trabajo__pieza" id="pieza-${p.i + 1}"${area}${st}><img src="${src}" alt="${t.titulo}" ${p.i > 1 ? 'loading="lazy"' : ''} decoding="async"></div>`;
   }
 
-  // manual de marca: el PDF se lee ahí mismo en la compu; en el celu, la tapa abre el PDF
+  // manual de marca: todas sus páginas en un recuadro que solo se scrollea (igual en todos los navegadores)
   function manual(p) {
-    const pdf = RUTA + p.pdf;
-    const tapa = RUTA + p.src;
-    const visor = !enCelu() && navigator.pdfViewerEnabled !== false;
-    return `<div class="trabajo__pdf" id="pieza-${p.i + 1}">` +
-      (visor
-        ? `<iframe class="trabajo__pdf-visor" src="${pdf}#view=FitH&amp;navpanes=0" title="manual de marca de ${t.titulo}" loading="lazy"></iframe>`
-        : `<a class="trabajo__pdf-tapa" href="${pdf}" target="_blank" rel="noopener"><img src="${tapa}" alt="manual de marca de ${t.titulo}" loading="lazy"></a>`) +
-      `<a class="btn-pdf" href="${pdf}" target="_blank" rel="noopener">ver el manual de marca en PDF <span>↗</span></a>` +
-      '</div>';
+    const carpeta = RUTA + p.src.replace(/[^/]+$/, '');
+    let hojas = '';
+    for (let n = 1; n <= p.manual; n++) {
+      const num = String(n).padStart(2, '0');
+      hojas += `<img src="${carpeta}p${num}.jpg" alt="manual de marca de ${t.titulo}, página ${n}" width="1600" height="1131"${n > 2 ? ' loading="lazy"' : ''} decoding="async">`;
+    }
+    return `<div class="trabajo__manual" id="pieza-${p.i + 1}"><div class="trabajo__manual-hojas">${hojas}</div></div>`;
   }
 
   function armar() {
-    const comunes = todas.filter(p => !p.pdf);
-    const pdfs = todas.filter(p => p.pdf);
+    const comunes = todas.filter(p => !p.manual);
+    const pdfs = todas.filter(p => p.manual);
     const bloque = t.mosaico
       ? `<div class="mosaico mosaico--${t.mosaico}">` + comunes.map(p => pieza(p)).join('') + '</div>'
       : armarFilas(comunes, enCelu() ? 1.1 : 1.75, pieza);
