@@ -11,6 +11,7 @@
 
   document.title = t.titulo + ' · Camila Izuel';
   document.getElementById('categoria').innerHTML = `<a href="proyectos.html?cat=${cat.id}">← ${cat.nombre}</a>`;
+  document.getElementById('volver').href = 'proyectos.html?cat=' + cat.id;   // la cruz de arriba a la izquierda
   document.getElementById('titulo').textContent = t.titulo;
   document.getElementById('texto').textContent = t.texto;
   const enlaceSig = document.getElementById('siguiente');
