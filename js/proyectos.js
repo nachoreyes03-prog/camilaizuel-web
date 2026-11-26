@@ -16,10 +16,18 @@
     return `<img src="${src}" alt="${nombre}" loading="lazy" decoding="async">`;
   }
 
-  function tarjeta(t, p, i, conNombre) {
-    p = pieza(p);
+  function tarjeta(t, p, i, conNombre, estilo) {
     const href = `trabajo.html?t=${t.id}` + (i ? `#pieza-${i + 1}` : '');
-    return `<a class="pieza${p.v ? ' pieza--vertical' : ''}" href="${href}">${media(p, t.titulo)}${conNombre ? `<span class="pieza__nombre">${t.titulo}</span>` : ''}</a>`;
+    const area = p.area ? ` data-area="${p.area}"` : '';
+    return `<a class="pieza" href="${href}"${area}${estilo ? ` style="${estilo}"` : ''}>${media(p, t.titulo)}${conNombre ? `<span class="pieza__nombre">${t.titulo}</span>` : ''}</a>`;
+  }
+
+  // piezas de un trabajo: mosaico de referencia o filas parejas
+  function piezasDe(t) {
+    const todas = t.piezas.map(pieza).map((p, i) => Object.assign({ i }, p));
+    if (t.mosaico) return `<div class="mosaico mosaico--${t.mosaico}">` + todas.map(p => tarjeta(t, p, p.i, false)).join('') + '</div>';
+    const cant = t.grilla || 4;
+    return armarFilas(todas.slice(0, cant), enCelu() ? 1.6 : 3.4, (p, estilo) => tarjeta(t, p, p.i, false, estilo));
   }
 
   function pintar(catId) {
@@ -30,15 +38,13 @@
     if (!lista.length) {
       html = `<section class="grupo"><h2 class="grupo__titulo">${cat.nombre}</h2><p class="vacio">las piezas de ${cat.nombre} se están subiendo :)</p></section>`;
     } else if (cat.modo === 'todos') {
-      html = `<section class="grupo"><h2 class="grupo__titulo">${cat.nombre}</h2><div class="grilla grilla--todos">` +
-        lista.map(t => tarjeta(t, t.piezas[0], 0, true)).join('') + '</div></section>';
+      const items = lista.map(t => Object.assign({ t }, pieza(t.piezas[0])));
+      html = `<section class="grupo"><h2 class="grupo__titulo">${cat.nombre}</h2>` +
+        armarFilas(items, enCelu() ? 1.6 : 3.4, (it, estilo) => tarjeta(it.t, it, 0, true, estilo)) + '</section>';
     } else {
-      html = lista.map(t => {
-        const cant = t.grilla || 4;
-        const piezas = t.piezas.map(pieza).filter(p => !p.v).slice(0, cant);
-        return `<section class="grupo aparece"><a class="grupo__titulo" href="trabajo.html?t=${t.id}">${t.titulo}</a><div class="grilla">` +
-          piezas.map(p => tarjeta(t, p, t.piezas.map(pieza).findIndex(q => q.src === p.src), false)).join('') + '</div></section>';
-      }).join('');
+      html = lista.map(t =>
+        `<section class="grupo aparece"><a class="grupo__titulo" href="trabajo.html?t=${t.id}">${t.titulo}</a>${piezasDe(t)}</section>`
+      ).join('');
     }
 
     listado.innerHTML = html;
@@ -80,6 +86,12 @@
   };
   window.addEventListener('popstate', alVolver);
   if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => window.removeEventListener('popstate', alVolver));
+
+  // al pasar de compu a celu (o al revés) las filas se rearman con otro tamaño
+  const mq = window.matchMedia('(max-width: 900px)');
+  const rearmar = () => pintar(new URLSearchParams(location.search).get('cat'));
+  if (mq.addEventListener) mq.addEventListener('change', rearmar); else mq.addListener(rearmar);
+  if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => { if (mq.removeEventListener) mq.removeEventListener('change', rearmar); else mq.removeListener(rearmar); });
 
   const inicial = pintar(new URLSearchParams(location.search).get('cat'));
   const activa = menu.querySelector(`[data-cat="${inicial.id}"]`);

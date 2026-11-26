@@ -18,20 +18,47 @@
   else { enlaceSig.href = 'proyectos.html?cat=' + cat.id; enlaceSig.firstChild.textContent = 'Ver más proyectos '; }
 
   const piezas = document.getElementById('piezas');
-  piezas.innerHTML = t.piezas.map((p, i) => {
-    p = typeof p === 'string' ? { src: p } : p;
+  const todas = t.piezas.map((p, i) => Object.assign({ i }, typeof p === 'string' ? { src: p } : p));
+
+  function pieza(p, estilo) {
     const src = RUTA + p.src;
-    const clase = 'trabajo__pieza aparece' + (p.v ? ' trabajo__pieza--vertical' : '');
+    const area = p.area ? ` data-area="${p.area}"` : '';
+    const st = estilo ? ` style="${estilo}"` : '';
     if (/\.mp4$/i.test(src)) {
       const poster = src.replace(/\.mp4$/i, '.jpg');
-      return `<div class="${clase}" id="pieza-${i + 1}"><video src="${src}" poster="${poster}" controls playsinline muted loop preload="${i < 2 ? 'auto' : 'metadata'}"${i === 0 ? ' autoplay' : ''}></video></div>`;
+      return `<div class="trabajo__pieza" id="pieza-${p.i + 1}"${area}${st}><video src="${src}" poster="${poster}" controls playsinline muted loop preload="${p.i < 2 ? 'auto' : 'metadata'}"${p.i === 0 ? ' autoplay' : ''}></video></div>`;
     }
-    return `<div class="${clase}" id="pieza-${i + 1}"><img src="${src}" alt="${t.titulo}" ${i > 1 ? 'loading="lazy"' : ''} decoding="async"></div>`;
-  }).join('');
-  observarAparece(piezas);
+    return `<div class="trabajo__pieza" id="pieza-${p.i + 1}"${area}${st}><img src="${src}" alt="${t.titulo}" ${p.i > 1 ? 'loading="lazy"' : ''} decoding="async"></div>`;
+  }
 
-  // los videos con sonido arrancan al 50 %
-  piezas.querySelectorAll('video').forEach(v => { v.volume = 0.5; });
+  // manual de marca: el PDF se lee ahí mismo en la compu; en el celu, la tapa abre el PDF
+  function manual(p) {
+    const pdf = RUTA + p.pdf;
+    const tapa = RUTA + p.src;
+    const visor = !enCelu() && navigator.pdfViewerEnabled !== false;
+    return `<div class="trabajo__pdf" id="pieza-${p.i + 1}">` +
+      (visor
+        ? `<iframe class="trabajo__pdf-visor" src="${pdf}#view=FitH" title="manual de marca de ${t.titulo}" loading="lazy"></iframe>`
+        : `<a class="trabajo__pdf-tapa" href="${pdf}" target="_blank" rel="noopener"><img src="${tapa}" alt="manual de marca de ${t.titulo}" loading="lazy"></a>`) +
+      `<a class="btn-pdf" href="${pdf}" target="_blank" rel="noopener">ver el manual de marca en PDF <span>↗</span></a>` +
+      '</div>';
+  }
+
+  function armar() {
+    const comunes = todas.filter(p => !p.pdf);
+    const pdfs = todas.filter(p => p.pdf);
+    const bloque = t.mosaico
+      ? `<div class="mosaico mosaico--${t.mosaico}">` + comunes.map(p => pieza(p)).join('') + '</div>'
+      : armarFilas(comunes, enCelu() ? 1.1 : 1.75, pieza);
+    piezas.innerHTML = bloque + pdfs.map(manual).join('');
+    piezas.querySelectorAll('video').forEach(v => { v.volume = 0.5; });
+    piezas.querySelectorAll('img').forEach(i => { if (!i.closest('a')) i.style.cursor = 'zoom-in'; });
+    observarAparece(piezas);
+  }
+  armar();
+  const mq = window.matchMedia('(max-width: 900px)');
+  if (mq.addEventListener) mq.addEventListener('change', armar); else mq.addListener(armar);
+  if (window.CAMI && CAMI.alSalir) CAMI.alSalir(() => { if (mq.removeEventListener) mq.removeEventListener('change', armar); else mq.removeListener(armar); });
 
   // si se entra a una pieza puntual, ir hasta ella
   if (location.hash) {
@@ -45,11 +72,10 @@
   const cerrar = () => { lupa.classList.remove('abierta'); contenido.innerHTML = ''; };
   piezas.addEventListener('click', e => {
     const img = e.target.closest('img');
-    if (!img) return;
+    if (!img || img.closest('a')) return;
     contenido.innerHTML = `<img src="${img.src}" alt="${img.alt}">`;
     lupa.classList.add('abierta');
   });
-  piezas.querySelectorAll('img').forEach(i => { i.style.cursor = 'zoom-in'; });
   document.getElementById('lupa-cerrar').addEventListener('click', cerrar);
   lupa.addEventListener('click', e => { if (e.target === lupa) cerrar(); });
   const conEscape = e => { if (e.key === 'Escape') cerrar(); };

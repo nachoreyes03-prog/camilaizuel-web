@@ -205,6 +205,25 @@
   });
 })();
 
+/* Filas parejas: cada pieza conserva su proporción (r) y todas las de una fila tienen la
+   misma altura. "objetivo" = suma de proporciones por fila (más alto = piezas más chicas). */
+function armarFilas(items, objetivo, tarjeta) {
+  const filas = [];
+  let fila = [], suma = 0;
+  items.forEach(it => {
+    fila.push(it); suma += it.r || 1.778;
+    if (suma >= objetivo) { filas.push({ fila, suma }); fila = []; suma = 0; }
+  });
+  if (fila.length) filas.push({ fila, suma, corta: true });
+  return '<div class="filas">' + filas.map(({ fila, suma, corta }) => {
+    const ancho = corta ? Math.min(1, suma / objetivo) : 1;
+    return `<div class="fila"${ancho < 1 ? ` style="width:${(ancho * 100).toFixed(2)}%"` : ''}>` +
+      fila.map(it => { const r = (it.r || 1.778).toFixed(4); return tarjeta(it, `flex:${r} ${r} 0;aspect-ratio:${r}`); }).join('') +
+      '</div>';
+  }).join('') + '</div>';
+}
+const enCelu = () => window.matchMedia('(max-width: 900px)').matches;
+
 /* Videos de las grillas: se reproducen solo cuando se ven */
 function videosVisibles(raiz) {
   const vids = (raiz || document).querySelectorAll('video[data-auto]');

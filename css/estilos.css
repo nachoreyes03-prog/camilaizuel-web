@@ -703,29 +703,49 @@ body.con-intro { overflow: hidden; }
 }
 a.grupo__titulo:hover { color: var(--rosa); }
 
-.grilla {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px 20px;
+/* filas parejas: cada pieza con su proporción (el estilo de cada una lo pone el JS) */
+.filas { display: flex; flex-direction: column; gap: 20px; }
+.fila { display: flex; gap: 20px; }
+.fila > * { min-width: 0; }
+
+/* mosaicos armados como los layouts de referencia de Cami */
+.mosaico { display: grid; gap: 20px; }
+.mosaico > [data-area] { position: relative; min-height: 0; aspect-ratio: auto; }
+.mosaico > * > img, .mosaico > * > video {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.grilla--todos {
+.mosaico--beauty {
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-flow: dense;
-  gap: 20px 15px;
+  grid-template-areas: "a b c" "a b d" "e f g";
 }
+.mosaico--beauty > [data-area="a"], .mosaico--beauty > [data-area="b"],
+.mosaico--beauty > [data-area="e"], .mosaico--beauty > [data-area="f"],
+.mosaico--beauty > [data-area="g"] { aspect-ratio: 0.8; }
+.mosaico--cyber {
+  grid-template-columns: 665fr 665fr 440fr 585fr;
+  grid-template-areas: "a b c d" "e e e d";
+}
+.mosaico--cyber > [data-area="a"], .mosaico--cyber > [data-area="b"] { aspect-ratio: 1; }
+.mosaico--cyber > [data-area="e"] { aspect-ratio: 5.922; }
+.mosaico > [data-area="a"] { grid-area: a; } .mosaico > [data-area="b"] { grid-area: b; }
+.mosaico > [data-area="c"] { grid-area: c; } .mosaico > [data-area="d"] { grid-area: d; }
+.mosaico > [data-area="e"] { grid-area: e; } .mosaico > [data-area="f"] { grid-area: f; }
+.mosaico > [data-area="g"] { grid-area: g; }
 
 .pieza {
   position: relative;
   display: block;
-  aspect-ratio: 590 / 317;
+  aspect-ratio: 16 / 9;
   border-radius: 30px;
   overflow: hidden;
   background: var(--rosa);
   cursor: pointer;
   isolation: isolate;
 }
-.grilla--todos .pieza { aspect-ratio: 415 / 317; }
-.grilla--todos .pieza--vertical { grid-row: span 2; aspect-ratio: auto; }
 .pieza img, .pieza video {
   width: 100%;
   height: 100%;
@@ -775,8 +795,39 @@ a.grupo__titulo:hover { color: var(--rosa); }
   overflow: hidden;
   background: var(--rosa);
 }
-.trabajo__pieza img, .trabajo__pieza video { width: 100%; height: auto; }
-.trabajo__pieza--vertical { width: min(100%, 460px); margin: 0 auto; }
+.trabajo__pieza img, .trabajo__pieza video { width: 100%; height: 100%; object-fit: cover; }
+.mosaico .trabajo__pieza { border-radius: 20px; }
+
+/* manual de marca en PDF */
+.trabajo__pdf { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-top: 20px; }
+.trabajo__pdf-visor {
+  width: 100%;
+  aspect-ratio: 1.3;
+  border: 0;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(89, 60, 56, .12);
+}
+.trabajo__pdf-tapa { display: block; width: 100%; border-radius: 20px; overflow: hidden; }
+.trabajo__pdf-tapa img { width: 100%; height: auto; }
+.btn-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px 0 24px;
+  border-radius: 23px;
+  background: var(--marron);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.08em;
+  text-decoration: none;
+  transition: background-color .25s, transform .25s;
+}
+.btn-pdf span { letter-spacing: 0; }
+.btn-pdf:hover { background: #6E4A45; transform: translateY(-2px); }
 
 .trabajo__info {
   position: sticky;
@@ -961,10 +1012,14 @@ a.grupo__titulo:hover { color: var(--rosa); }
   .listado { padding-top: 54px; padding-bottom: 70px; }
   .grupo + .grupo { margin-top: 64px; }
   .grupo__titulo { font-size: 48px; margin-bottom: 28px; text-decoration-thickness: 2px; }
-  .grilla { grid-template-columns: 1fr; gap: 14px; }
-  .grilla--todos { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .pieza, .grilla--todos .pieza { border-radius: 20px; }
-  .pieza__nombre { opacity: 1; transform: none; font-size: 14px; left: 10px; bottom: 10px; }
+  .pieza__nombre { opacity: 1; transform: none; font-size: 13px; left: 8px; bottom: 8px; }
+  .pieza { border-radius: 18px; }
+  .filas, .fila, .mosaico { gap: 10px; }
+  .mosaico--beauty { grid-template-columns: 1fr 1fr; grid-template-areas: "a b" "c d" "e f" "g ."; }
+  .mosaico--beauty > [data-area="c"], .mosaico--beauty > [data-area="d"] { aspect-ratio: 1.8; }
+  .mosaico--cyber { grid-template-columns: 1fr 1fr; grid-template-areas: "a b" "c d" "e e"; }
+  .mosaico--cyber > [data-area="c"] { aspect-ratio: 0.665; }
+  .btn-pdf { font-size: 16px; height: 42px; }
 
   .trabajo { grid-template-columns: 1fr; padding-top: 40px; gap: 28px; }
   .trabajo__info { position: static; order: -1; padding-top: 0; }
@@ -975,7 +1030,6 @@ a.grupo__titulo:hover { color: var(--rosa); }
 
 @media (max-width: 480px) {
   .intro__botones { gap: 24px; }
-  .grilla--todos { grid-template-columns: 1fr 1fr; }
 }
 
 /* iPhone viejos sin aspect-ratio */
