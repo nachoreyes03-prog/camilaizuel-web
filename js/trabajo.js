@@ -38,7 +38,7 @@
     const visor = !enCelu() && navigator.pdfViewerEnabled !== false;
     return `<div class="trabajo__pdf" id="pieza-${p.i + 1}">` +
       (visor
-        ? `<iframe class="trabajo__pdf-visor" src="${pdf}#view=FitH" title="manual de marca de ${t.titulo}" loading="lazy"></iframe>`
+        ? `<iframe class="trabajo__pdf-visor" src="${pdf}#view=FitH&amp;navpanes=0" title="manual de marca de ${t.titulo}" loading="lazy"></iframe>`
         : `<a class="trabajo__pdf-tapa" href="${pdf}" target="_blank" rel="noopener"><img src="${tapa}" alt="manual de marca de ${t.titulo}" loading="lazy"></a>`) +
       `<a class="btn-pdf" href="${pdf}" target="_blank" rel="noopener">ver el manual de marca en PDF <span>↗</span></a>` +
       '</div>';

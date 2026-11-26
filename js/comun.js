@@ -211,12 +211,20 @@ function armarFilas(items, objetivo, tarjeta) {
   const filas = [];
   let fila = [], suma = 0;
   items.forEach(it => {
-    fila.push(it); suma += it.r || 1.778;
+    const r = it.r || 1.778;
+    // cortar la fila donde la suma queda más cerca del objetivo
+    if (fila.length && suma + r - objetivo > objetivo - suma) { filas.push({ fila, suma }); fila = []; suma = 0; }
+    fila.push(it); suma += r;
     if (suma >= objetivo) { filas.push({ fila, suma }); fila = []; suma = 0; }
   });
   if (fila.length) filas.push({ fila, suma, corta: true });
+  // una pieza que quedó sola al final se suma a la fila anterior si entra bien
+  const ult = filas[filas.length - 1], ant = filas[filas.length - 2];
+  if (ult && ant && ult.fila.length === 1 && ant.suma + ult.suma <= objetivo * 1.5) {
+    ant.fila.push(ult.fila[0]); ant.suma += ult.suma; filas.pop();
+  }
   return '<div class="filas">' + filas.map(({ fila, suma, corta }) => {
-    const ancho = corta ? Math.min(1, suma / objetivo) : 1;
+    const ancho = corta && suma < objetivo * 0.7 ? suma / objetivo : 1;
     return `<div class="fila"${ancho < 1 ? ` style="width:${(ancho * 100).toFixed(2)}%"` : ''}>` +
       fila.map(it => { const r = (it.r || 1.778).toFixed(4); return tarjeta(it, `flex:${r} ${r} 0;aspect-ratio:${r}`); }).join('') +
       '</div>';
